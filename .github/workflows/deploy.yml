@@ -1,0 +1,28 @@
+name: AutoOps Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ec2-user/autoops
+            git pull origin main
+            docker build -t autoops-app ./app
+            docker stop autoops-app || true
+            docker rm autoops-app || true
+            docker run -d --name autoops-app -p 80:80 autoops-app
