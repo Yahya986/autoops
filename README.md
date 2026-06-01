@@ -18,6 +18,8 @@ Push code to GitHub → AutoOps automatically:
 | CI/CD | GitHub Actions |
 | Networking | AWS Security Groups |
 | App | FastAPI (Python) |
+| Monitoring | Prometheus, Grafana, Node Exporter |
+| Reliability | Docker restart policies |
 
 ## Architecture
 
