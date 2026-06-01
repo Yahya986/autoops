@@ -54,7 +54,7 @@ autoops/
 - `GET /` → returns system status
 - `GET /health` → returns health check
 
-## What's Next (Phase 2)
+## Observability & Reliability Engineering
 
 - Prometheus monitoring & Grafana dashboards
 - Auto-scaling with load balancing
