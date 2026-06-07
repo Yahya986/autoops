@@ -88,7 +88,8 @@ Grafana visualizes CPU, RAM, Disk, Network
 ↓
 All services auto-restart on reboot via systemd
 
-## What's Next (Phase 4)
-- Load balancing across multiple servers
-- Ansible configuration management
-- Remote Terraform state in S3
+## Load Balancing & Auto Scaling 
+- AWS Application Load Balancer distributing traffic across multiple servers
+- Auto Scaling Group (2 servers by default, scales up to 4 under load)
+- Health checks every 30 seconds — unhealthy instances removed automatically
+- Live at: http://autoops-alb-573839267.us-east-1.elb.amazonaws.com
