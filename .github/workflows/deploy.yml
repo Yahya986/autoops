@@ -22,6 +22,10 @@ jobs:
 
       - name: Trigger instance refresh
         run: |
+          ASG_NAME=$(aws autoscaling describe-auto-scaling-groups \
+            --query "AutoScalingGroups[0].AutoScalingGroupName" \
+            --output text)
+          echo "ASG Name: $ASG_NAME"
           aws autoscaling start-instance-refresh \
-            --auto-scaling-group-name $(aws autoscaling describe-auto-scaling-groups --query "AutoScalingGroups[?contains(Tags[?Key=='Name'].Value, 'autoops-server')].AutoScalingGroupName" --output text) \
+            --auto-scaling-group-name "$ASG_NAME" \
             --preferences '{"MinHealthyPercentage": 50}'
