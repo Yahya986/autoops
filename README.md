@@ -1,95 +1,98 @@
-# AutoOps 🚀
+# AutoOps
 
-An automated cloud deployment platform that provisions infrastructure, containerizes applications, and deploys them automatically using a full CI/CD pipeline.
+A production-grade cloud deployment platform built to automate the full DevOps lifecycle — from infrastructure provisioning to containerized deployments, real-time observability, and auto-scaling.
 
-## What This Does
+## Overview
 
-Push code to GitHub → AutoOps automatically:
-- Builds a Docker image
-- Deploys the container to AWS EC2
-- Serves the app on a live public IP
+AutoOps eliminates manual deployment workflows. Every push to the main branch triggers a fully automated pipeline that builds, tests, and deploys the application across a load-balanced, auto-scaling AWS infrastructure — with zero downtime.
+
+## Architecture
+
+Developer pushes code to GitHub
+│
+▼
+GitHub Actions CI/CD Pipeline
+│
+▼
+AWS Auto Scaling Group
+┌─────────────────────┐
+│  EC2 Instance 1     │
+│  EC2 Instance 2     │  ← scales up to 4 under load
+└─────────────────────┘
+│
+▼
+AWS Application Load Balancer
+(health checks every 30s)
+│
+▼
+Live Application
+│
+▼
+Prometheus → Grafana
+(metrics, dashboards, alerts)
 
 ## Tech Stack
 
 | Layer | Technology |
-|-------|-----------|
+|---|---|
 | Infrastructure | Terraform, AWS EC2 |
+| Networking | AWS ALB, Auto Scaling Group |
 | Containerization | Docker |
 | CI/CD | GitHub Actions |
-| Networking | AWS Security Groups |
-| App | FastAPI (Python) |
 | Monitoring | Prometheus, Grafana, Node Exporter |
-| Reliability | Docker restart policies |
+| Reliability | systemd, Docker restart policies |
+| Application | FastAPI (Python) |
 
-## Architecture
+## Key Features
 
-Developer pushes code
-↓
-GitHub Actions triggers
-↓
-SSH into EC2 server
-↓
-Pull latest code
-↓
-Build Docker image
-↓
-Deploy container on port 80
-↓
-App live at public IP
+**Infrastructure as Code**
+All AWS resources — EC2, ALB, Auto Scaling Groups, and Security Groups — are defined and provisioned using Terraform. The entire infrastructure can be created or torn down with a single command.
+
+**Automated CI/CD**
+GitHub Actions triggers on every push to main. The pipeline builds a fresh Docker image and initiates an AWS Auto Scaling Group instance refresh, ensuring zero-downtime deployments across all running instances.
+
+**Observability Stack**
+Prometheus scrapes server metrics every 15 seconds. Grafana dashboards visualize CPU, memory, disk, and network in real time. All monitoring services run as systemd units and survive server reboots automatically.
+
+**Auto Scaling & Load Balancing**
+The AWS Application Load Balancer distributes traffic across a minimum of 2 EC2 instances, scaling up to 4 under high load. Unhealthy instances are automatically detected and replaced via ALB health checks.
+
+**Self-Healing Infrastructure**
+All services (Prometheus, Grafana, Node Exporter, Docker) are registered as systemd services. On server reboot, every service restarts automatically with no manual intervention required.
 
 ## Project Structure
+
 autoops/
 ├── app/
-│   ├── main.py          # FastAPI application
-│   ├── requirements.txt # Python dependencies
-│   └── Dockerfile       # Container definition
+│   ├── main.py              # FastAPI application
+│   ├── requirements.txt     # Python dependencies
+│   └── Dockerfile           # Container definition
 ├── terraform/
-│   └── main.tf          # AWS infrastructure as code
+│   └── main.tf              # AWS infrastructure as code
 └── .github/
 └── workflows/
-└── deploy.yml   # CI/CD pipeline
+└── deploy.yml       # CI/CD pipeline
 
-## Live Endpoint
 
-- `GET /` → returns system status
-- `GET /health` → returns health check
+## API
 
-## Observability & Reliability Engineering
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/` | Returns system status |
+| GET | `/health` | Health check — used by AWS ALB |
 
-- Prometheus monitoring & Grafana dashboards
-- Auto-scaling with load balancing
-- Ansible for configuration management
-- Fault tolerance & auto-recovery
+## Infrastructure Setup
 
-## Tech Stack
+```bash
+# Provision all AWS infrastructure
+cd terraform
+terraform init
+terraform apply
 
-| Layer | Technology |
-|-------|-----------|
-| Infrastructure | Terraform, AWS EC2 |
-| Containerization | Docker |
-| CI/CD | GitHub Actions |
-| Monitoring | Prometheus, Grafana, Node Exporter |
-| Reliability | systemd services, Docker restart policies |
-| App | FastAPI (Python) |
+# Tear down all resources
+terraform destroy
+```
 
-## Architecture
+## Live
 
-Developer pushes code
-↓
-GitHub Actions triggers
-↓
-SSH into EC2 server
-↓
-Pull latest code → Build Docker image → Deploy container
-↓
-Prometheus scrapes metrics every 15s
-↓
-Grafana visualizes CPU, RAM, Disk, Network
-↓
-All services auto-restart on reboot via systemd
-
-## Load Balancing & Auto Scaling 
-- AWS Application Load Balancer distributing traffic across multiple servers
-- Auto Scaling Group (2 servers by default, scales up to 4 under load)
-- Health checks every 30 seconds — unhealthy instances removed automatically
-- Live at: http://autoops-alb-573839267.us-east-1.elb.amazonaws.com
+**Load Balancer:** http://autoops-alb-573839267.us-east-1.elb.amazonaws.com
