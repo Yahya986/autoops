@@ -61,7 +61,34 @@ autoops/
 - Ansible for configuration management
 - Fault tolerance & auto-recovery
 
-## What's Next (Phase 3)
-- Auto-scaling with load balancing
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Infrastructure | Terraform, AWS EC2 |
+| Containerization | Docker |
+| CI/CD | GitHub Actions |
+| Monitoring | Prometheus, Grafana, Node Exporter |
+| Reliability | systemd services, Docker restart policies |
+| App | FastAPI (Python) |
+
+## Architecture
+
+Developer pushes code
+↓
+GitHub Actions triggers
+↓
+SSH into EC2 server
+↓
+Pull latest code → Build Docker image → Deploy container
+↓
+Prometheus scrapes metrics every 15s
+↓
+Grafana visualizes CPU, RAM, Disk, Network
+↓
+All services auto-restart on reboot via systemd
+
+## What's Next (Phase 4)
+- Load balancing across multiple servers
 - Ansible configuration management
-- Fault tolerance across multiple servers
+- Remote Terraform state in S3
